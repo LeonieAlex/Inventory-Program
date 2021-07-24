@@ -7,14 +7,26 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-
-import java.io.IOException;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HomePageController implements Initializable {
 
@@ -35,6 +47,9 @@ public class HomePageController implements Initializable {
 
     @FXML
     private TextField SerialNum;
+
+    @FXML
+    private TextField FileName;
 
     @FXML
     private TextField Value;
@@ -303,11 +318,33 @@ public class HomePageController implements Initializable {
         return item;
     }
 
-
-
     @FXML
-    void OpenHTML(ActionEvent event) {
+    void OpenHTML(ActionEvent event) throws IOException {
+        String filename = FileName.getText();
+        if(filename.equals("")){
+            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
+        }
+        if(!filename.contains("html")){
+            filename += ".html";
+        }
+        File input = new File(filename);
+        Document doc = null;
+        ObservableList<Item> html = FXCollections.observableArrayList();
+        try {
+            doc = Jsoup.parse(input, "UTF-8");
+            Element table = doc.select("table").get(0);
+            Elements rows = table.select("tr");
 
+            for (int i = 1; i < rows.size(); i++) {
+                Element row = rows.get(i);
+                Elements cols = row.getElementsByTag("td");
+                String[] arrOfStr = cols.text().split(" ", 3);
+                html.add(new Item(arrOfStr[0], arrOfStr[1], arrOfStr[2]));
+            }
+            tableView.setItems(html);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -316,17 +353,99 @@ public class HomePageController implements Initializable {
      */
     @FXML
     void OpenJSON(ActionEvent event) throws IOException {
-        tableView.setItems(JsonFile.readJson());
+        String filename = FileName.getText();
+        if(filename.equals("")){
+            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
+        }
+        if(!filename.contains("json")){
+            filename += ".json";
+        }
+        tableView.setItems(JsonFile.readJson(filename));
     }
 
     @FXML
     void OpenTSV(ActionEvent event) {
+        String filename = FileName.getText();
+        if(filename.equals("")){
+            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
+        }
+        if(!filename.contains("tsv")){
+            filename += ".tsv";
+        }
+        String FieldDelimiter = "\t";
+        ObservableList<Item> tsv = FXCollections.observableArrayList();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
 
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split(FieldDelimiter, -1);
+
+                Item inventory = new Item(fields[0], fields[1], fields[2]);
+                tsv.add(inventory);
+                tableView.setItems(tsv);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @FXML
     void SaveToHTML(ActionEvent event) {
+        String filename = FileName.getText();
+        if(filename.equals("")){
+            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
+        }
+        if(!filename.contains("html")){
+            filename += ".html";
+        }
+        File myObj = new File(filename);
+        try {
+            FileWriter writer = new FileWriter(myObj);
+            Writer bw = new BufferedWriter(writer);
 
+            String output = "";
+            output += "<!DOCTYPE html>\n" +
+                    "<html>\n" +
+                    "<head>\n" +
+                    "<style>\n" +
+                    "table {\n" +
+                    "  font-family: arial, sans-serif;\n" +
+                    "  border-collapse: collapse;\n" +
+                    "  width: 100%;\n" +
+                    "}\n" +
+                    "\n" +
+                    "td, th {\n" +
+                    "  border: 1px solid #dddddd;\n" +
+                    "  text-align: left;\n" +
+                    "  padding: 8px;\n" +
+                    "}\n" +
+                    "</style>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "<table>\n" +
+                    "  <tr>\n" +
+                    "    <th>Value</th>\n" +
+                    "    <th>Serial Number</th>\n" +
+                    "    <th>Name</th>\n" +
+                    "  </tr>\n";
+            for (Item test : item) {
+                output += "<tr>\n" +
+                        "    <td>" + test.getItemValue()+ "</td>\n" +
+                        "    <td>" + test.getItemNumber()+ "</td>\n" +
+                        "    <td>" + test.getItemName() + "</td>\n" +
+                        "</tr>\n";
+            }
+            output +="</table>\n" +
+                    "\n" +
+                    "</body>\n" +
+                    "</html>\n";
+            bw.write(output);
+
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -335,12 +454,41 @@ public class HomePageController implements Initializable {
      */
     @FXML
     void SaveToJSON(ActionEvent event) throws IOException {
-        JsonFile.ToJson(item);
+        String filename = FileName.getText();
+        if(filename.equals("")){
+            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
+        }
+        if(!filename.contains("json")){
+            filename += ".json";
+        }
+        JsonFile.ToJson(item, filename);
     }
 
     @FXML
-    void SaveToTSV(ActionEvent event) {
+    void SaveToTSV(ActionEvent event) throws IOException {
+        String filename = FileName.getText();
+        if(filename.equals("")){
+            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
+        }
+        if(!filename.contains("tsv")){
+            filename += ".tsv";
+        }
+        Writer writer = null;
+        try {
+            File file = new File(filename);
+            writer = new BufferedWriter(new FileWriter(file));
+            for (Item test : item) {
+                String text = test.getItemValue() + "\t" + test.getItemNumber() + "\t" + test.getItemName() + "\n";
 
+                writer.write(text);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        finally {
+            writer.flush();
+            writer.close();
+        }
     }
 
     /*
@@ -362,7 +510,6 @@ public class HomePageController implements Initializable {
         } else {
             tableView.getSortOrder().remove(TableName);
         }
-
     }
 
     /*

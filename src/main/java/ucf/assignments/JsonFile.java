@@ -19,8 +19,8 @@ public class JsonFile {
         }
     }
      */
-    public static void ToJson(ObservableList<Item> Item) throws IOException {
-        File myObj = new File("App.json");
+    public static void ToJson(ObservableList<Item> Item, String filename) throws IOException {
+        File myObj = new File(filename);
         try {
             FileWriter writer = new FileWriter(myObj);
             Writer bw = new BufferedWriter(writer);
@@ -41,8 +41,8 @@ public class JsonFile {
         return TransferContents
     }
      */
-    public static ObservableList<Item> readJson() throws IOException {
-        Reader reader = Files.newBufferedReader(Paths.get("App.json"));
+    public static ObservableList<Item> readJson(String filename) throws IOException {
+        Reader reader = Files.newBufferedReader(Paths.get(filename));
         Gson gson = new Gson();
         Item[] enums = gson.fromJson(reader, Item[].class);
 
