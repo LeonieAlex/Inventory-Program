@@ -7,26 +7,17 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.ResourceBundle;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 public class HomePageController implements Initializable {
 
@@ -47,9 +38,6 @@ public class HomePageController implements Initializable {
 
     @FXML
     private TextField SerialNum;
-
-    @FXML
-    private TextField FileName;
 
     @FXML
     private TextField Value;
@@ -318,20 +306,40 @@ public class HomePageController implements Initializable {
         return item;
     }
 
+    /*
+    Get String called filename which takes the returned from OpenPopUp()
+    if the filename does not contain html
+        Add "html"
+    Create File that opens the filename
+    Create document which is null
+    Create Observable Item for html
+    try
+        doc = the file
+        Take the first table
+        Take rows which are values enclosed in <tr></tr> in html file
+
+        for(if i =0, i is less than row size, increase i by 1)
+            get Element rows of i
+            Get element columns which get values enclosed by <td>
+            Create an array of Strings for each column
+            Split the columns by " " and its limit is 3
+            Add the items to the html Observable List
+        setItems
+     catch
+        print error
+     */
     @FXML
     void OpenHTML(ActionEvent event) throws IOException {
-        String filename = FileName.getText();
-        if(filename.equals("")){
-            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
-        }
-        if(!filename.contains("html")){
+        String filename = OpenPopUP();
+
+        if (!filename.contains("html")){
             filename += ".html";
         }
-        File input = new File(filename);
+        File fileOpen = new File(filename);
         Document doc = null;
         ObservableList<Item> html = FXCollections.observableArrayList();
         try {
-            doc = Jsoup.parse(input, "UTF-8");
+            doc = Jsoup.parse(fileOpen, "UTF-8");
             Element table = doc.select("table").get(0);
             Elements rows = table.select("tr");
 
@@ -349,27 +357,44 @@ public class HomePageController implements Initializable {
 
     /*
     OpenJSON
+        Get the filename which is the string returned from OpenPopUP()
+        if(filename does not contain json)
+            add json
         call ReadJson
+        setitems
      */
     @FXML
     void OpenJSON(ActionEvent event) throws IOException {
-        String filename = FileName.getText();
-        if(filename.equals("")){
-            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
-        }
-        if(!filename.contains("json")){
+        String filename = OpenPopUP();
+
+        if (!filename.contains("json")){
             filename += ".json";
         }
         tableView.setItems(JsonFile.readJson(filename));
     }
 
+    /*
+    Get String called filename which takes the returned from OpenPopUp()
+    if the filename does not contain tsv
+        Add "tsv"
+    Create String for FieldDelimiter which is \t
+    Create observable list of tsv
+    try
+        Create Buffered Reader br which reads the filename
+
+        Create a string line
+        while(there are lines in the file and is not null, read)
+            Split by \t
+            Add Item
+            setItems
+     catch
+        print error
+     */
     @FXML
     void OpenTSV(ActionEvent event) {
-        String filename = FileName.getText();
-        if(filename.equals("")){
-            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
-        }
-        if(!filename.contains("tsv")){
+        String filename = OpenPopUP();
+
+        if (!filename.contains("tsv")){
             filename += ".tsv";
         }
         String FieldDelimiter = "\t";
@@ -390,13 +415,31 @@ public class HomePageController implements Initializable {
         }
     }
 
+    /*
+    Get String called filename which takes the returned from OpenPopUp()
+    if the filename does not contain html
+        Add "html"
+
+    Create new File which takes the filename
+    try
+        Create Filewriter which takes the file
+        Create Writer which BufferWrites the writer
+
+        String outpuut = "";
+        Initialise the output with the css and <body>, <title> and whatever
+        for(Item test: item)
+            Add output which takes each itemvalue, number and Name in html form
+        then add the last line of the html file which consists of closing the table, body
+        write the output
+        flush
+     catch
+        error
+     */
     @FXML
     void SaveToHTML(ActionEvent event) {
-        String filename = FileName.getText();
-        if(filename.equals("")){
-            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
-        }
-        if(!filename.contains("html")){
+        String filename = OpenPopUP();
+
+        if (!filename.contains("html")){
             filename += ".html";
         }
         File myObj = new File(filename);
@@ -450,27 +493,44 @@ public class HomePageController implements Initializable {
 
     /*
     SaveToJSON
+        Get String filename from the String returned by OpenPopUp
+        if(the filename does not contain json)
+            Add Json
         Call ToJson
      */
     @FXML
     void SaveToJSON(ActionEvent event) throws IOException {
-        String filename = FileName.getText();
-        if(filename.equals("")){
-            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
-        }
-        if(!filename.contains("json")){
+        String filename = OpenPopUP();
+
+        if (!filename.contains("json")){
             filename += ".json";
         }
         JsonFile.ToJson(item, filename);
     }
 
+    /*
+    Create String filename which takes the String returned from OpenPopUP()
+
+    if(the filename does not contain tsv)
+        Add tsv to the filename
+    Create a writer which is null
+    try
+        Create file which takes the filename
+        Create a writer which is a Buffered Writer of the file
+        for(item test: item)
+            Create a String of text which gets their value and separated by tabs
+            Write the text
+     catch
+        print error
+     finally
+        flush writer
+        close writer
+     */
     @FXML
     void SaveToTSV(ActionEvent event) throws IOException {
-        String filename = FileName.getText();
-        if(filename.equals("")){
-            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
-        }
-        if(!filename.contains("tsv")){
+        String filename = OpenPopUP();
+
+        if (!filename.contains("tsv")){
             filename += ".tsv";
         }
         Writer writer = null;
@@ -570,5 +630,35 @@ public class HomePageController implements Initializable {
             }
         }
         return true;
+    }
+
+    /*
+    String OpenPopUp
+        Initialise filename as empty
+        Create a TextInputDialog of textInput
+        set its title
+        set the Text
+        Create an Optional String of result which shows the TextInputDialog
+        Create a textfield
+        filename is the text from textfield
+
+        if(the input has a length of 0)
+            Display an alert
+        return filename
+     */
+    public String OpenPopUP(){
+        String filename = "";
+        TextInputDialog textInput = new TextInputDialog();
+        textInput.setTitle("Enter File Name to Be Saved or Opened");
+        textInput.getDialogPane().setContentText("File Name");
+        Optional<String> result = textInput.showAndWait();
+        TextField input = textInput.getEditor();
+        filename = input.getText();
+
+        if (input.getText().length() == 0){
+            AlertBox.display("No File name entered", "Write the name of the filename to be saved or opened.");
+        }
+
+        return filename;
     }
 }

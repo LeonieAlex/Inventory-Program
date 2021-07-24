@@ -51,7 +51,5 @@
       <CheckBox fx:id="ValueCheckBox" layoutX="63.0" layoutY="471.0" mnemonicParsing="false" onAction="#SortByValue" text="Sort by Value" />
       <CheckBox fx:id="SerialNumberCheckbox" layoutX="175.0" layoutY="471.0" mnemonicParsing="false" onAction="#SortBySerialNumber" text="Sort by Serial Number" />
       <CheckBox fx:id="NameCheckbox" layoutX="327.0" layoutY="471.0" mnemonicParsing="false" onAction="#SortByName" text="Sort by Name" />
-      <TextField fx:id="FileName" layoutX="429.0" layoutY="85.0" />
-      <Text layoutX="398.0" layoutY="72.0" strokeType="OUTSIDE" strokeWidth="0.0" text="File Name To Be Saved or Opened: " />
    </children>
 </AnchorPane>
