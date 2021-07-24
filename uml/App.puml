@@ -1,0 +1,79 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+App <|-- HomePageController
+HomePageController <|-- Item
+HomePageController <|-- Validation
+HomePageController <|-- JsonFile
+HomePageController <|-- AlertBox
+
+class AlertBox {
+display(String title, String message)
+}
+
+class App {
+start()
+main()
+}
+
+class Item {
++String ItemName, ItemValue, ItemNumber
++Item()
++getItemValue()
++setItemValue()
++getItemNumber()
++setItemNumber()
++getItemName()
++setItemName()
++toString()
+}
+
+class JsonFile {
++ToJson()
++readJson()
++transferContents()
+}
+
+class Validation {
++isAlphaNumeric()
++checkSerial()
++checkItemName()
+ChangeName()
+ChangeNumber()
++isNumeric()
+}
+
+class HomePageController {
+-TableView<Item> tableView
+-TableColumn<Item, String> TableValue
+-TableColumn<Item, String> TableSerialNum
+-TableColumn<Item, String> TableName
+-TextField ItemName
+-TextField SerialNum
+-TextField Value
+-TextField SearchBox
+-CheckBox ValueCheckBox
+-CheckBox serialNumberCheckbox
+-CheckBox NameCheckbox
++ObservableList<Item> item
+onButtonClickAdd()
+ChangeSerialNumber()
+ChangeName()
+ChangeValue()
+OnClickRemove()
+initialize()
++getItem()
+OpenHTML()
+OpenJSON()
+OpenTSV()
+SaveToHTML()
+SaveToJSON()
+SaveToTSV()
+SortByName()
+SortBySerialNumber()
+SortByValue()
++CheckDuplicate()
+}
+
+
+@enduml
