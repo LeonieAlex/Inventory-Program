@@ -1,5 +1,7 @@
 package ucf.assignments;
 
+import java.text.DecimalFormat;
+
 public class Validation {
     public static boolean isAlphaNumeric(String s){
         String pattern= "^[a-zA-Z0-9]*$";
@@ -29,5 +31,16 @@ public class Validation {
     public static boolean isNumeric(String s){
         String pattern = "^[0-9]*$";
         return s.matches(pattern);
+    }
+
+    public static String ChangeValue(String New, String Old){
+        if(!isNumeric(New)){
+            return Old;
+        } else {
+            float newValue = Float.parseFloat(New);
+            DecimalFormat df = new DecimalFormat("#.##");
+            df.setMinimumFractionDigits(2);
+            return "$" + df.format(newValue);
+        }
     }
 }

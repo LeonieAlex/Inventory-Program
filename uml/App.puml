@@ -5,7 +5,6 @@ App <|-- HomePageController
 HomePageController <|-- Item
 HomePageController <|-- Validation
 HomePageController <|-- JsonFile
-HomePageController <|-- AlertBox
 
 class AlertBox {
 display(String title, String message)
@@ -73,6 +72,7 @@ SortByName()
 SortBySerialNumber()
 SortByValue()
 +CheckDuplicate()
++OpenPopUP()
 }
 
 

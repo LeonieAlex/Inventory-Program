@@ -17,6 +17,8 @@ import org.jsoup.select.Elements;
 import java.io.*;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 
 public class HomePageController implements Initializable {
@@ -203,16 +205,11 @@ public class HomePageController implements Initializable {
         String New = editedCell.getNewValue().toString();
         String Old = editedCell.getOldValue().toString();
 
-        if(!Validation.isNumeric(New)){
+        if(Validation.ChangeValue(New, Old).equals(Old)){
             AlertBox.display("Error", "Data inputted must be numeric");
             taskSelected.setItemValue(Old);
         } else {
-            float newValue = Float.parseFloat(New);
-            DecimalFormat df = new DecimalFormat("#.##");
-            df.setMinimumFractionDigits(2);
-            String newString = "$" + df.format(newValue);
-
-            taskSelected.setItemValue(newString);
+            taskSelected.setItemValue(Validation.ChangeValue(New, Old));
         }
 
         tableView.refresh();
@@ -332,26 +329,28 @@ public class HomePageController implements Initializable {
     void OpenHTML(ActionEvent event) throws IOException {
         String filename = OpenPopUP();
 
-        if (!filename.contains("html")){
-            filename += ".html";
-        }
-        File fileOpen = new File(filename);
-        Document doc = null;
-        ObservableList<Item> html = FXCollections.observableArrayList();
-        try {
-            doc = Jsoup.parse(fileOpen, "UTF-8");
-            Element table = doc.select("table").get(0);
-            Elements rows = table.select("tr");
-
-            for (int i = 1; i < rows.size(); i++) {
-                Element row = rows.get(i);
-                Elements cols = row.getElementsByTag("td");
-                String[] arrOfStr = cols.text().split(" ", 3);
-                html.add(new Item(arrOfStr[0], arrOfStr[1], arrOfStr[2]));
+        if(!filename.isEmpty()) {
+            if (!filename.contains("html")) {
+                filename += ".html";
             }
-            tableView.setItems(html);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            File fileOpen = new File(filename);
+            Document doc = null;
+            ObservableList<Item> html = FXCollections.observableArrayList();
+            try {
+                doc = Jsoup.parse(fileOpen, "UTF-8");
+                Element table = doc.select("table").get(0);
+                Elements rows = table.select("tr");
+
+                for (int i = 1; i < rows.size(); i++) {
+                    Element row = rows.get(i);
+                    Elements cols = row.getElementsByTag("td");
+                    String[] arrOfStr = cols.text().split(" ", 3);
+                    html.add(new Item(arrOfStr[0], arrOfStr[1], arrOfStr[2]));
+                }
+                tableView.setItems(html);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -366,11 +365,12 @@ public class HomePageController implements Initializable {
     @FXML
     void OpenJSON(ActionEvent event) throws IOException {
         String filename = OpenPopUP();
-
-        if (!filename.contains("json")){
-            filename += ".json";
+        if(!filename.isEmpty()) {
+            if (!filename.contains("json")) {
+                filename += ".json";
+            }
+            tableView.setItems(JsonFile.readJson(filename));
         }
-        tableView.setItems(JsonFile.readJson(filename));
     }
 
     /*
@@ -394,24 +394,26 @@ public class HomePageController implements Initializable {
     void OpenTSV(ActionEvent event) {
         String filename = OpenPopUP();
 
-        if (!filename.contains("tsv")){
-            filename += ".tsv";
-        }
-        String FieldDelimiter = "\t";
-        ObservableList<Item> tsv = FXCollections.observableArrayList();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(filename));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] fields = line.split(FieldDelimiter, -1);
-
-                Item inventory = new Item(fields[0], fields[1], fields[2]);
-                tsv.add(inventory);
-                tableView.setItems(tsv);
+        if(!filename.isEmpty()) {
+            if (!filename.contains("txt")) {
+                filename += ".txt";
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            String FieldDelimiter = "\t";
+            ObservableList<Item> tsv = FXCollections.observableArrayList();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(filename));
+
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] fields = line.split(FieldDelimiter, -1);
+
+                    Item inventory = new Item(fields[0], fields[1], fields[2]);
+                    tsv.add(inventory);
+                    tableView.setItems(tsv);
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -439,55 +441,57 @@ public class HomePageController implements Initializable {
     void SaveToHTML(ActionEvent event) {
         String filename = OpenPopUP();
 
-        if (!filename.contains("html")){
-            filename += ".html";
-        }
-        File myObj = new File(filename);
-        try {
-            FileWriter writer = new FileWriter(myObj);
-            Writer bw = new BufferedWriter(writer);
-
-            String output = "";
-            output += "<!DOCTYPE html>\n" +
-                    "<html>\n" +
-                    "<head>\n" +
-                    "<style>\n" +
-                    "table {\n" +
-                    "  font-family: arial, sans-serif;\n" +
-                    "  border-collapse: collapse;\n" +
-                    "  width: 100%;\n" +
-                    "}\n" +
-                    "\n" +
-                    "td, th {\n" +
-                    "  border: 1px solid #dddddd;\n" +
-                    "  text-align: left;\n" +
-                    "  padding: 8px;\n" +
-                    "}\n" +
-                    "</style>\n" +
-                    "</head>\n" +
-                    "<body>\n" +
-                    "<table>\n" +
-                    "  <tr>\n" +
-                    "    <th>Value</th>\n" +
-                    "    <th>Serial Number</th>\n" +
-                    "    <th>Name</th>\n" +
-                    "  </tr>\n";
-            for (Item test : item) {
-                output += "<tr>\n" +
-                        "    <td>" + test.getItemValue()+ "</td>\n" +
-                        "    <td>" + test.getItemNumber()+ "</td>\n" +
-                        "    <td>" + test.getItemName() + "</td>\n" +
-                        "</tr>\n";
+        if(!filename.isEmpty()) {
+            if (!filename.contains("html")) {
+                filename += ".html";
             }
-            output +="</table>\n" +
-                    "\n" +
-                    "</body>\n" +
-                    "</html>\n";
-            bw.write(output);
+            File myObj = new File(filename);
+            try {
+                FileWriter writer = new FileWriter(myObj);
+                Writer bw = new BufferedWriter(writer);
 
-            bw.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+                String output = "";
+                output += "<!DOCTYPE html>\n" +
+                        "<html>\n" +
+                        "<head>\n" +
+                        "<style>\n" +
+                        "table {\n" +
+                        "  font-family: arial, sans-serif;\n" +
+                        "  border-collapse: collapse;\n" +
+                        "  width: 100%;\n" +
+                        "}\n" +
+                        "\n" +
+                        "td, th {\n" +
+                        "  border: 1px solid #dddddd;\n" +
+                        "  text-align: left;\n" +
+                        "  padding: 8px;\n" +
+                        "}\n" +
+                        "</style>\n" +
+                        "</head>\n" +
+                        "<body>\n" +
+                        "<table>\n" +
+                        "  <tr>\n" +
+                        "    <th>Value</th>\n" +
+                        "    <th>Serial Number</th>\n" +
+                        "    <th>Name</th>\n" +
+                        "  </tr>\n";
+                for (Item test : item) {
+                    output += "<tr>\n" +
+                            "    <td>" + test.getItemValue() + "</td>\n" +
+                            "    <td>" + test.getItemNumber() + "</td>\n" +
+                            "    <td>" + test.getItemName() + "</td>\n" +
+                            "</tr>\n";
+                }
+                output += "</table>\n" +
+                        "\n" +
+                        "</body>\n" +
+                        "</html>\n";
+                bw.write(output);
+
+                bw.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -502,10 +506,12 @@ public class HomePageController implements Initializable {
     void SaveToJSON(ActionEvent event) throws IOException {
         String filename = OpenPopUP();
 
-        if (!filename.contains("json")){
-            filename += ".json";
+        if(!filename.isEmpty()) {
+            if (!filename.contains("json")) {
+                filename += ".json";
+            }
+            JsonFile.ToJson(item, filename);
         }
-        JsonFile.ToJson(item, filename);
     }
 
     /*
@@ -529,25 +535,25 @@ public class HomePageController implements Initializable {
     @FXML
     void SaveToTSV(ActionEvent event) throws IOException {
         String filename = OpenPopUP();
-
-        if (!filename.contains("tsv")){
-            filename += ".tsv";
-        }
-        Writer writer = null;
-        try {
-            File file = new File(filename);
-            writer = new BufferedWriter(new FileWriter(file));
-            for (Item test : item) {
-                String text = test.getItemValue() + "\t" + test.getItemNumber() + "\t" + test.getItemName() + "\n";
-
-                writer.write(text);
+        if(!filename.isEmpty()) {
+            if (!filename.contains("txt")) {
+                filename += ".txt";
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        finally {
-            writer.flush();
-            writer.close();
+            Writer writer = null;
+            try {
+                File file = new File(filename);
+                writer = new BufferedWriter(new FileWriter(file));
+                for (Item test : item) {
+                    String text = test.getItemValue() + "\t" + test.getItemNumber() + "\t" + test.getItemName() + "\n";
+
+                    writer.write(text);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                writer.flush();
+                writer.close();
+            }
         }
     }
 
@@ -661,4 +667,363 @@ public class HomePageController implements Initializable {
 
         return filename;
     }
+
+    /*
+    For JUnit
+     */
+
+    /*
+    This function is made for JUnit to check whether 100 items can be added
+
+    CountAll()
+        Create an Observable List called TestForAdd
+        Create an Integer count which equals to 0
+        Create an int for Serial Number which equals to 1000000000
+
+        for(int i=0; i<100; i++)
+            SerialNumber increases by 1
+            Create a String Number which makes SerialNumber as a String
+            add Item to TestForAdd
+
+        for(Item test: TestForAdd)
+            count++
+        return count;
+     */
+    static Integer CountAll(){
+        ObservableList<Item> TestForAdd = FXCollections.observableArrayList();
+        Integer count=0;
+        int SerialNumber = 1000000000;
+
+        for(int i=0; i<100; i++){
+            SerialNumber++;
+            String Number = String.valueOf(SerialNumber);
+            TestForAdd.add(new Item("$399.99", Number, "Xbox One"));
+        }
+
+        for(Item test : TestForAdd) {
+            count++;
+        }
+        return count;
+    }
+
+    /*
+    This function is to JUnit removing items
+
+    CountRemove()
+        Create an Observable List called task
+        Add task
+
+        remove one task at index 1
+        Count size
+        return countsize
+     */
+    static Integer CountRemove(){
+        ObservableList<Item> task = FXCollections.observableArrayList();
+
+        task.add(new Item("$399.99", "AXB124AXY3", "Xbox One"));
+        task.add(new Item("$399.99", "1000000000", "Xbox One"));
+
+        task.remove(1);
+        Integer CountRemove = task.size();
+
+        return CountRemove;
+    }
+
+    /*
+    This function is used to Search from Serial Num
+
+    SearchSerialNum
+        Create an Observable List called task
+        Create a String called itemDetail which equals to nothing
+
+        add tasks
+
+        for(Item test: task)
+            Create String called completion which gets the ItemNumber
+            if(completion equals to AXB124AXY3)
+                itemDetail = its Value, Number and Name
+        return itemDetail
+     */
+    static String SearchSerialNum(){
+        ObservableList<Item> task = FXCollections.observableArrayList();
+        String itemDetail = "";
+
+        task.add(new Item("$399.99", "AXB124AXY3", "Xbox One"));
+        task.add(new Item("$399.99", "1000000000", "Xbox One"));
+
+
+        for(Item test : task) {
+            String completion = test.getItemNumber();
+            if(completion.equals("AXB124AXY3"))
+               itemDetail = test.getItemValue() + " " + test.getItemNumber() + " " + test.getItemName();
+        }
+        return itemDetail;
+    }
+
+    /*
+    This function is used to Search from Name
+
+    SearchSerialNum
+        Create an Observable List called task
+        Create a String called itemDetail which equals to nothing
+
+        add tasks
+
+        for(Item test: task)
+            Create String called completion which gets the ItemNumber
+            if(completion equals to Xbox One)
+                itemDetail = its Value, Number and Name
+        return itemDetail
+     */
+    static String SearchByName(){
+        ObservableList<Item> task = FXCollections.observableArrayList();
+        String itemDetail = "";
+
+        task.add(new Item("$399.99", "AXB124AXY3", "Xbox One"));
+        task.add(new Item("$399.99", "1000000000", "Playstation"));
+
+
+        for(Item test : task) {
+            String completion = test.getItemName();
+            if(completion.equals("Xbox One"))
+                itemDetail = test.getItemValue() + " " + test.getItemNumber() + " " + test.getItemName();
+        }
+        return itemDetail;
+    }
+
+    /*
+    This function is used to CheckJson
+
+    CheckJson()
+        Create an Observable List called task
+        add tasks
+
+        Call ToJson function for file called "App.json)
+        Create an Observable List called output which calls the readJson of App.json
+
+        for(int i=0; i<size of task; i++)
+            if(task equals to output)
+                return 1
+            else
+                return 0;
+     */
+    static Integer CheckJson() throws IOException {
+        ObservableList<Item> task = FXCollections.observableArrayList();
+        task.add(new Item("$399.99", "AXB124AXY3", "Xbox One"));
+        task.add(new Item("$399.99", "1000000000", "Playstation"));
+
+        JsonFile.ToJson(task, "App.json");
+        ObservableList<Item> output =  JsonFile.readJson("App.json");
+
+        for (int i = 0; i < task.size(); i++){
+            if(task.get(i).toString().equals(output.get(i).toString())){
+                return 1;
+            }else{
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    /*
+    This function checks saved Json
+
+    CheckSaveJson()
+        Create an Observable List called task
+        add tasks
+        Call toJson function for "App.json"
+        Createa  file
+        Create a Scanner for the file
+
+        if(file has content)
+            return 1
+        return 0;
+     */
+    static Integer CheckSaveJson() throws IOException {
+        ObservableList<Item> task = FXCollections.observableArrayList();
+        task.add(new Item("$399.99", "AXB124AXY3", "Xbox One"));
+        task.add(new Item("$399.99", "1000000000", "Playstation"));
+
+        JsonFile.ToJson(task, "App.json");
+
+        File myObj = new File("App.json");
+        Scanner myReader = new Scanner(myObj);
+        if(myReader.hasNext()){
+            return 1;
+        }
+        return 0;
+    }
+
+    /*
+    This function is used to check whether table can be saved to TSV and read from TSV
+
+    SaveAndReadTSV()
+        Create an ObservableList called task
+        task add
+
+        Create a string for filename called Bleh
+        if filename does not contain txt
+            filename adds .txt
+        Create a writer which is null
+
+        try
+            Createa a file which takes teh filename
+            Create a writer which takes the file as BufferedWriter
+            for(Item test: task)
+                String text = format of tsv
+                write text
+        catch
+            error
+        finally
+            flush writer
+            writer close
+
+        Create BufferedReader called br
+
+        Create a String line
+        Createa String called result which is ""
+        while(there's a next line)
+            Createa String[] called fields which separates contents by \t
+            Add item from the String[]
+            string result adds field[0] field[1] and field[2]
+        return result
+     */
+    static String SaveAndReadTSV() throws IOException {
+        ObservableList<Item> task = FXCollections.observableArrayList();
+        task.add(new Item("$399.99", "AXB124AXY3", "Xbox One"));
+        task.add(new Item("$399.99", "1000000000", "Playstation"));
+
+        String filename = "Bleh";
+        if (!filename.contains("txt")) {
+            filename += ".txt";
+        }
+        Writer writer = null;
+        try {
+            File file = new File(filename);
+            writer = new BufferedWriter(new FileWriter(file));
+            for (Item test : task) {
+                String text = test.getItemValue() + "\t" + test.getItemNumber() + "\t" + test.getItemName() + "\n";
+
+                writer.write(text);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            writer.flush();
+            writer.close();
+        }
+
+        BufferedReader br = new BufferedReader(new FileReader("Bleh.txt"));
+
+        String line;
+        String result ="";
+        while ((line = br.readLine()) != null) {
+            String[] fields = line.split("\t", -1);
+
+            Item inventory = new Item(fields[0], fields[1], fields[2]);
+            result += fields[0] + "\t" + fields[1] + "\t" + fields[2] + "\n";
+        }
+        return result;
+    }
+
+    /*
+    This function checks whether table can be saved to HTML and can load from HTML
+
+    SaveAndReadHTML()
+        Create an ObservableList called task
+        add tasks
+
+        Create a String called filename as Bleh
+        if filename does not contain html
+            Add .html to filename
+        Create a writer which is ull
+        try
+            Create Writer
+            Create a string output which has the first part of the html
+            for(Item item: task)
+                Add a string to output which has the test's Value, Number and name
+            Add a string to output which is the end of the html file such as the </table> </body> and </html>
+            write output
+            flush writer
+        catch
+            Error
+        Create a bufferedReader for Bleh.html
+        Create a string called line
+        Create a string called result which is equal to ""
+        try
+            while there is next line
+            add line to result
+        catch
+            Error
+        return result
+     */
+    static String SaveAndReadHTML() throws IOException {
+        ObservableList<Item> task = FXCollections.observableArrayList();
+        task.add(new Item("$399.99", "AXB124AXY3", "Xbox One"));
+        task.add(new Item("$399.99", "1000000000", "Playstation"));
+
+        String filename = "Bleh";
+        if (!filename.contains("html")) {
+            filename += ".html";
+        }
+        Writer writer = null;
+        try {
+            Writer bw = new BufferedWriter(new FileWriter("Bleh.html"));
+
+            String output = "";
+            output += "<!DOCTYPE html>\n" +
+                    "<html>\n" +
+                    "<head>\n" +
+                    "<style>\n" +
+                    "table {\n" +
+                    "  font-family: arial, sans-serif;\n" +
+                    "  border-collapse: collapse;\n" +
+                    "  width: 100%;\n" +
+                    "}\n" +
+                    "\n" +
+                    "td, th {\n" +
+                    "  border: 1px solid #dddddd;\n" +
+                    "  text-align: left;\n" +
+                    "  padding: 8px;\n" +
+                    "}\n" +
+                    "</style>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "<table>\n" +
+                    "  <tr>\n" +
+                    "    <th>Value</th>\n" +
+                    "    <th>Serial Number</th>\n" +
+                    "    <th>Name</th>\n" +
+                    "  </tr>\n";
+            for (Item test : task) {
+                output += "<tr>\n" +
+                        "    <td>" + test.getItemValue() + "</td>\n" +
+                        "    <td>" + test.getItemNumber() + "</td>\n" +
+                        "    <td>" + test.getItemName() + "</td>\n" +
+                        "</tr>\n";
+            }
+            output += "</table>\n" +
+                    "\n" +
+                    "</body>\n" +
+                    "</html>\n";
+            bw.write(output);
+
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        BufferedReader br = new BufferedReader(new FileReader("Bleh.html"));
+        String line;
+        String result ="";
+        try {
+            while ((line = br.readLine()) != null) {
+                result += line + "\n";
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 }
