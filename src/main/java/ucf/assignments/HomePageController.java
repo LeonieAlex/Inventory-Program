@@ -17,8 +17,6 @@ import org.jsoup.select.Elements;
 import java.io.*;
 import java.net.URL;
 import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.*;
 
 public class HomePageController implements Initializable {
@@ -65,6 +63,8 @@ public class HomePageController implements Initializable {
     public final ObservableList<Item> item = FXCollections.observableArrayList();
 
     /*
+    This function is used to add a new item to the table
+
     Get string name from ItemName textfield
     Get string serialNumber from SerialNum textfield
     Get string a from Value textfield
@@ -121,6 +121,7 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function is used to edit serial Number in the cell
     ChangeSerialNumber{
         Get taskSelected from the selected cell
         Create New string which takes the New Value
@@ -154,6 +155,7 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This is used to edit the cell for Name
     ChangeName{
         Get taskSelected from the selected cell
         Create New string which takes the New Value
@@ -183,6 +185,7 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This is used to edit the cell for Value
     ChangeValue{
         Get taskSelected from the selected cell
         Create New string which takes the New Value
@@ -216,6 +219,7 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This is to remove selected item
     OnClickRemove{
         Create ObservableList called selectedRows
         let selectedRows equal to selected row in table
@@ -296,6 +300,13 @@ public class HomePageController implements Initializable {
         tableView.setItems(sortedData);
     }
 
+    /*
+    This is used to add items to the table such that when run, there's 2 items already in the table
+    getItem()
+        item add
+
+        return item
+     */
     public ObservableList<Item> getItem(){
         item.add(new Item("$399.00", "AXB124AXY3", "XBox One"));
         item.add(new Item("$299.99", "S40AZBDE47", "Playstation"));
@@ -304,6 +315,9 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function is used to Open html document
+
+
     Get String called filename which takes the returned from OpenPopUp()
     if the filename does not contain html
         Add "html"
@@ -355,6 +369,7 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function is used to open a json file and set the items in the json file to the table
     OpenJSON
         Get the filename which is the string returned from OpenPopUP()
         if(filename does not contain json)
@@ -374,6 +389,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function is used to open a TSV file which will then set the contents of the tsv file to the table
+
     Get String called filename which takes the returned from OpenPopUp()
     if the filename does not contain tsv
         Add "tsv"
@@ -418,6 +435,9 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function will save the data in the table to a html file
+
+
     Get String called filename which takes the returned from OpenPopUp()
     if the filename does not contain html
         Add "html"
@@ -496,6 +516,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function saves the data of the table to a json file
+
     SaveToJSON
         Get String filename from the String returned by OpenPopUp
         if(the filename does not contain json)
@@ -515,6 +537,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function saves the data of a table to a tsv file
+
     Create String filename which takes the String returned from OpenPopUP()
 
     if(the filename does not contain tsv)
@@ -558,6 +582,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function allows sorting of Name when the checkbox is checked
+
     if(the Checkbox is selected)
         set all the other checkbox as not selected
         remove TableValue and TableSerialNum column sort
@@ -579,6 +605,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function allows sorting the SerialNumber column when the checkbox is ticked
+
     if(the Checkbox is selected)
         set all the other checkbox as not selected
         remove TableValue and TableName column sort
@@ -600,6 +628,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function allows the sorting of Values when the checkbox is ticked
+
     if(the Checkbox is selected)
         set all the other checkbox as not selected
         remove TableSerialNum and TableName column sort
@@ -621,6 +651,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    This function checks to see if there is a duplicate number for SerialNumbers
+
     CheckDuplicate which takes String s
         for(Item test: item)
             Create String called checkNum which gets the serialNumber
@@ -639,6 +671,8 @@ public class HomePageController implements Initializable {
     }
 
     /*
+    this function is used to create PopUp window
+
     String OpenPopUp
         Initialise filename as empty
         Create a TextInputDialog of textInput
