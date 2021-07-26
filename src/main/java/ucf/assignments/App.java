@@ -7,6 +7,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /*
+ *  UCF COP3330 Summer 2021 Assignment 5 Solution
+ *  Copyright 2021 Leonie Alexandra
+ */
+
+/*
 This function is used to run the app
 start function
     Create a Parent which loads an fxml file

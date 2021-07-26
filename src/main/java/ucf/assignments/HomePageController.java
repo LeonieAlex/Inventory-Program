@@ -19,6 +19,11 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 
+/*
+ *  UCF COP3330 Summer 2021 Assignment 5 Solution
+ *  Copyright 2021 Leonie Alexandra
+ */
+
 public class HomePageController implements Initializable {
 
     @FXML

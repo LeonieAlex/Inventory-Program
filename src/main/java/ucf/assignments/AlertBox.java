@@ -7,6 +7,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+/*
+ *  UCF COP3330 Summer 2021 Assignment 5 Solution
+ *  Copyright 2021 Leonie Alexandra
+ */
+
 public class AlertBox {
     /*
     Create a new function called display in which takes the title and message

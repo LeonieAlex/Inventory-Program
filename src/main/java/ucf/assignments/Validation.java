@@ -2,6 +2,11 @@ package ucf.assignments;
 
 import java.text.DecimalFormat;
 
+/*
+ *  UCF COP3330 Summer 2021 Assignment 5 Solution
+ *  Copyright 2021 Leonie Alexandra
+ */
+
 public class Validation {
     /*
     This is used to check whether a string is alphanumeric

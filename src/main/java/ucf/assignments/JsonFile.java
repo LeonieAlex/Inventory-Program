@@ -8,6 +8,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/*
+ *  UCF COP3330 Summer 2021 Assignment 5 Solution
+ *  Copyright 2021 Leonie Alexandra
+ */
+
 public class JsonFile {
     /*
     ToJson(Observable List that wants to be in Json){

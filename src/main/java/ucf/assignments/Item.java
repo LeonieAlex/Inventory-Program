@@ -1,7 +1,9 @@
 package ucf.assignments;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+/*
+ *  UCF COP3330 Summer 2021 Assignment 5 Solution
+ *  Copyright 2021 Leonie Alexandra
+ */
 
 public class Item {
     public String ItemName, ItemValue, ItemNumber;
