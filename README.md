@@ -1,4 +1,3 @@
-# **alexandra-1570-a5**
 ## Requirements
 The project is an Inventory which satisfies these requirements:
 1. The user shall interact with the application through a Graphical User Interface
@@ -47,7 +46,7 @@ If nothing is entered, the Program will warn the user that nothing was entered.
 
 This idea is used for the Open command in the MenuBar. A pop up window will allow the user to write the name and location of the file they'd like to open. 
 
-###TextFields and Table
+### TextFields and Table
 The TextFields on the Top Left is used so the User can add data to the table.
 
 In this Inventory Program, the user shall add 3 properties of items added to the inventory: 
@@ -67,15 +66,15 @@ The correct format of each is
 
 The Benefit of using Tables allows me to easily set cells as editable. If new edited cells does not satisfy the format for each item properties, an alert box will alert the User. 
 
-###3 Checkboxes
+### 3 Checkboxes
 The Checkboxes below the table allows user to sort the table based on Value, Serial Number or Name. 
 Although Tables can do this by clicking the heading of each columns, I thought that having them in checkboxes are more intuitive. 
 
-###Remove Button
+### Remove Button
 This Remove Button allows user to delete a row of data in the Table. 
 The User must select a row in the table first before clicking on the button.
 
-###Search TextField
+### Search TextField
 This Textfield allows user to be able to Search an item in the Table 
 The search is only based on Name and Serial number. 
 
